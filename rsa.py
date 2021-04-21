@@ -1,4 +1,4 @@
-
+import random
 
 #gyorhatványozás
 def gyorsh(a, b, m):
@@ -44,7 +44,7 @@ def miller_rabin(p, a):
    
         #a a d-ediken teszt
         if (a ** d) % p == 1:
-            return str(p) +  " valószínűleg prím!"
+            return True
         else:
             #a 2 az i-edking szer d tesztek
 
@@ -56,9 +56,9 @@ def miller_rabin(p, a):
                 i = i + 1
             
             if sikeres:
-                return str(p) + " valószínűleg prím!"
+                return True
             else:
-                return str(p) + " összetett!"
+                return False
 
 
 #Kibővített euklideszi algoritmus
@@ -104,10 +104,10 @@ def kib_eukildesz(a, b):
 
 def main(): 
     #print(gyorsh(6, 73, 100))
-    #print(miller_rabin(561, 2))
-    #print(miller_rabin(73, 2))
-    #print(miller_rabin(97, 2))
-    print("A d: értéke:",kib_eukildesz(402, 123))
-    print("A d: értéke:",kib_eukildesz(160, 47))
-
+    print(miller_rabin(561, 2))
+    print(miller_rabin(73, 2))
+    print(miller_rabin(97, 2))
+    #print("A d: értéke:",kib_eukildesz(402, 123))
+    #print("A d: értéke:",kib_eukildesz(160, 47))
+    
 main()
