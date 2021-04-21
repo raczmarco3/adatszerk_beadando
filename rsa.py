@@ -72,6 +72,7 @@ def kib_eukildesz(a, b):
     i = 2
     #táblázat feltöltése
     while(maradek > 0):
+        #a kettővel és az eggyel előző számokból kiszámoljuk a maradékot
         maradek = d[i-2][0]%d[i-1][0]
         #a +1-edik sor 0 maradék kiküszöbölése
         if(maradek > 0):
@@ -83,8 +84,12 @@ def kib_eukildesz(a, b):
         d[i] = [maradek, egesz, x, y]
         i = i + 1
     
+    #lépésszám meghatározása
     n = i - 2
+    #utolsó nem 0 maradék
     r = d[n][0]
+
+    #x és y meghatározása
     x = (-1) ** n * d[n][2]
     y = (-1) ** (n + 1) * d[n][3]
 
