@@ -30,7 +30,7 @@ def gyorsh(a, b, m):
 def miller_rabin(p, a):
 
     #Leellenőrizzük a p-t
-    if(p % 2 == 0):
+    if(p % 2 == 0 or p < 4):
         return "A p-nek 3-nál nagyobb páratlan egésznek kell lennie!"
     else:
         d = p - 1
