@@ -103,8 +103,7 @@ def rsa_titkositas(m):
         #p és q ellenőrzése,ha megegyeznek akkor addig generálok q-t amíg nem különböznek
         if p == q:
             while(p == q):
-                q = Crypto.Util.number.getPrime(1024)    
-    
+                q = Crypto.Util.number.getPrime(1024)        
 
     n = p * q
     fn = (p - 1) * (q - 1)
@@ -134,17 +133,23 @@ def rsa_visszafejtes(c):
 
     return m    
 
-#string átalakítása binárissá
+#string átalakítása
 def string_atalakitas(szoveg):
     lista = []
-
     #végigmegyünk a stringen karakterenként
     for i in szoveg:
         #beletesszük a listába a karakterek unicode karakterkódjait
         lista.append(ord(i))
-
     return(lista)
 
+#karakerkódok visszalakítása stringgé
+def string_visszalakitas(lista):
+    szoveg = ""
+
+    for i in lista:
+        szoveg = szoveg + chr(i)
+
+    return szoveg
 
 #gyorhatványozás
 def gyorsh(a, b, m):
@@ -173,7 +178,9 @@ def main():
     print("A titkosított üzenet: ", m)
     print(rsa_visszafejtes(m))
     szoveg = "asd saddas asd 20"
-    string_atalakitas(szoveg)
+    c = string_atalakitas(szoveg)
+    print(c)
+    print(string_visszalakitas(c))
     
     
 
