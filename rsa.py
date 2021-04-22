@@ -18,7 +18,7 @@ def miller_rabin(p, a):
             s = s + 1
    
         #a a d-ediken teszt
-        if (a ** d) % p == 1:
+        if gyorsh(a, d, p) == 1:
             return True
         else:
             #a 2 az i-ediken szer d tesztek
@@ -26,7 +26,7 @@ def miller_rabin(p, a):
             i = 0
 
             while(i < s and not sikeres):
-                if (a ** ((2 ** i) * d)) % p == p - 1:
+                if gyorsh(a, (2**i) * d, p) == p - 1:
                     sikeres = True
                 i = i + 1
             
@@ -87,36 +87,63 @@ def rsa_titkositas(m):
     global p
     global d
     global n
-    #p és q legenerálása
-    p = Crypto.Util.number.getPrime(1000)
-    q = Crypto.Util.number.getPrime(1000)
-    #p = 463
-    #q = 547
-
-    #print(p)
-    #print()
-    #print(q)
-
+    #p legenerálása majd miller-rabin prímteszttel megnézzük,hogy prím-e, hanem akkor addig generáljuk, amíg prim nem lesz
+    p = Crypto.Util.number.getPrime(1024)
+    while not miller_rabin(p, 2):
+        p = Crypto.Util.number.getPrime(1024)
+    
+    #q legenerálása majd miller-rabin prímteszttel megnézzük,hogy prím-e, hanem akkor addig generáljuk, amíg prim nem lesz
+    q = Crypto.Util.number.getPrime(1024)
     #p és q ellenőrzése,ha megegyeznek akkor addig generálok q-t amíg nem különböznek
     if p == q:
         while(p == q):
             q = Crypto.Util.number.getPrime(1024)
+    while not miller_rabin(q, 2):
+        q = Crypto.Util.number.getPrime(1024)
+        #p és q ellenőrzése,ha megegyeznek akkor addig generálok q-t amíg nem különböznek
+        if p == q:
+            while(p == q):
+                q = Crypto.Util.number.getPrime(1024)    
+    
 
     n = p * q
-    #print("n: ",n)
     fn = (p - 1) * (q - 1)
-    #e = 47
     e = 65537
 
     d = kib_eukildesz(fn, e)
+    #negatív szám kiküszöbölése
     if d < 0:
         d = d % fn
 
-    #print("d: ",d)
-
-    titok = (m ** e) % n
-
+    #titkosítás
+    titok = gyorsh(m, e, n)
     return titok
+
+
+def rsa_visszafejtes(c):
+    #kiszámoljuk a dp-t és a dq-t d mod (p-1) és d mod (q-1)
+    dp = d % (p - 1)
+    dq = d % (q - 1)
+    #a dp és qp értékek felhasználásával kiszámoljuk mp-t és a mq-t (a titkosított üzenetet dp és dq hatványra emeljük majd mod q és p)
+    mp = gyorsh(c, dp, p)
+    mq = gyorsh(c, dq, q)
+    #eukilidészi algoritmussal kiszámoljuk az x-et és az y-t
+    kib_eukildesz(p, q)
+    #visszafejtjük a titkosított üzenetet
+    m = (mp * y * q + mq * x * p) % n
+
+    return m    
+
+#string átalakítása binárissá
+def string_atalakitas(szoveg):
+    lista = []
+
+    #végigmegyünk a stringen karakterenként
+    for i in szoveg:
+        #beletesszük a listába a karakterek unicode karakterkódjait
+        lista.append(ord(i))
+
+    return(lista)
 
 
 #gyorhatványozás
@@ -135,21 +162,6 @@ def gyorsh(a, b, m):
     return eredmeny
 
 
-def rsa_visszafejtes(c):
-    #kiszámoljuk a dp-t és a dq-t d mod (p-1) és d mod (q-1)
-    dp = d % (p - 1)
-    dq = d % (q - 1)
-    #a dp és qp értékek felhasználásával kiszámoljuk mp-t és a mq-t (a titkosított üzenetet dp és dq hatványra emeljük majd mod q és p)
-    mp = gyorsh(c, dp, p)
-    mq = gyorsh(c, dq, q)
-    #eukilidészi algoritmussal kiszámoljuk az x-et és az y-t
-    kib_eukildesz(p, q)
-    #visszafejtjük a titkosított üzenetet
-    m = (mp * y * q + mq * x * p) % n
-
-    return m    
-
-
 def main(): 
     #print(gyorsh(6, 73, 100))
     #print(miller_rabin(561, 2))
@@ -160,6 +172,9 @@ def main():
     m = rsa_titkositas(2)
     print("A titkosított üzenet: ", m)
     print(rsa_visszafejtes(m))
+    szoveg = "asd saddas asd 20"
+    string_atalakitas(szoveg)
+    
     
 
 main()
