@@ -87,6 +87,9 @@ def rsa_titkositas(m):
     global p
     global d
     global n
+
+    m = string_atalakitas(m)
+
     #p legenerálása majd miller-rabin prímteszttel megnézzük,hogy prím-e, hanem akkor addig generáljuk, amíg prim nem lesz
     p = Crypto.Util.number.getPrime(1024)
     while not miller_rabin(p, 2):
@@ -113,25 +116,32 @@ def rsa_titkositas(m):
     #negatív szám kiküszöbölése
     if d < 0:
         d = d % fn
-
+    titok = ""
     #titkosítás
-    titok = gyorsh(m, e, n)
+    for i in m:
+        titok = titok + str(gyorsh(i, e, n)) + " "
     return titok
 
 
-def rsa_visszafejtes(c):
+def rsa_visszafejtes(msg):
     #kiszámoljuk a dp-t és a dq-t d mod (p-1) és d mod (q-1)
     dp = d % (p - 1)
     dq = d % (q - 1)
-    #a dp és qp értékek felhasználásával kiszámoljuk mp-t és a mq-t (a titkosított üzenetet dp és dq hatványra emeljük majd mod q és p)
-    mp = gyorsh(c, dp, p)
-    mq = gyorsh(c, dq, q)
-    #eukilidészi algoritmussal kiszámoljuk az x-et és az y-t
-    kib_eukildesz(p, q)
-    #visszafejtjük a titkosított üzenetet
-    m = (mp * y * q + mq * x * p) % n
+    #feldaraboljuk a titoksított üzenetet
+    msg = msg.split()
+    m = []
+    for c in msg:
+        #a dp és qp értékek felhasználásával kiszámoljuk mp-t és a mq-t (a titkosított üzenetet dp és dq hatványra emeljük majd mod q és p)
+        c = int(c)
+        mp = gyorsh(c, dp, p)
+        mq = gyorsh(c, dq, q)
+        #eukilidészi algoritmussal kiszámoljuk az x-et és az y-t
+        kib_eukildesz(p, q)
+        #visszafejtjük a titkosított üzenetet és beletesszük az eredményt egy listába
+        m.append((mp * y * q + mq * x * p) % n)
 
-    return m    
+    #visszaadjuk a visszafejtett üzenetet
+    return string_visszalakitas(m)
 
 #string átalakítása
 def string_atalakitas(szoveg):
@@ -174,13 +184,11 @@ def main():
     #print(miller_rabin(97, 2))
     #print("A d: értéke:",kib_eukildesz(402, 123))
     #print("A d: értéke:",kib_eukildesz(160, 47))
-    m = rsa_titkositas(2)
+    szoveg = "Ez egy titkosítandó üzenet!"
+    print("Titkosítandó szöveg: ", szoveg)
+    m = rsa_titkositas(szoveg)
     print("A titkosított üzenet: ", m)
-    print(rsa_visszafejtes(m))
-    szoveg = "asd saddas asd 20"
-    c = string_atalakitas(szoveg)
-    print(c)
-    print(string_visszalakitas(c))
+    print("A visszafejtett üzenet: ",rsa_visszafejtes(m))    
     
     
 
